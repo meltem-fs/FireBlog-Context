@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useContext } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -13,13 +13,19 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 
+import { Link, useNavigate } from "react-router-dom";
+import { logOut } from "../helpers/firebase";
+import { AuthContext } from "../contexts/AuthContextProvider";
 
 const settings = ["Login", "Register"];
+const pages = ["Profile", "NewBlog", "Dashboard"];
 
 function Navbar() {
+  const navigate = useNavigate()
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
+  const { currentUser } = useContext(AuthContext);
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -39,7 +45,6 @@ function Navbar() {
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
           <Typography
             variant="h6"
             noWrap
@@ -55,11 +60,11 @@ function Navbar() {
               textDecoration: "none",
             }}
           >
-            CODEANKA
+            CodeAnka
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-            <IconButton
+            {/* <IconButton
               size="large"
               aria-label="account of current user"
               aria-controls="menu-appbar"
@@ -68,7 +73,7 @@ function Navbar() {
               color="inherit"
             >
               <MenuIcon />
-            </IconButton>
+            </IconButton> */}
             <Menu
               id="menu-appbar"
               anchorEl={anchorElNav}
@@ -88,7 +93,7 @@ function Navbar() {
               }}
             ></Menu>
           </Box>
-          <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
+
           <Typography
             variant="h5"
             noWrap
@@ -105,7 +110,7 @@ function Navbar() {
               textDecoration: "none",
             }}
           >
-            CODEANKA
+            CodeAnka
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}></Box>
 
@@ -131,11 +136,40 @@ function Navbar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
+              {currentUser
+                ? pages.map((pages) => (
+                    <MenuItem key={pages} onClick={handleCloseUserMenu}>
+                      <Link
+                        to={`/${pages.toLocaleLowerCase()}`}
+                        style={{ textDecoration: "none", color: "black" }}
+                      >
+                        <Typography textAlign="center">{pages}</Typography>{" "}
+                      </Link>
+                    </MenuItem>
+                  ))
+                : settings.map((setting) => (
+                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                      <Link
+                        to={`/${setting.toLocaleLowerCase()}`}
+                        style={{ textDecoration: "none", color: "black" }}
+                      >
+                        <Typography textAlign="center">{setting}</Typography>
+                      </Link>
+                    </MenuItem>
+                  ))}
+              {currentUser && (
+                <MenuItem onClick={handleCloseUserMenu}>
+                  <Link
+                    to="/login"
+                    onClick={() => {
+                      logOut();
+                    }}
+                    style={{ textDecoration: "none", color: "black" }}
+                  >
+                    <Typography textAlign="center">Logout</Typography>
+                  </Link>
                 </MenuItem>
-              ))}
+              )}
             </Menu>
           </Box>
         </Toolbar>

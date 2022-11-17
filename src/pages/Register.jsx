@@ -11,6 +11,7 @@ import { TextField, Button } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import * as yup from "yup";
 import { signUpWithGoogle } from "../helpers/firebase";
+import { useState } from "react";
 const loginSchema = yup.object().shape({
   email: yup
     .string()
@@ -37,6 +38,23 @@ const Register = () => {
 const handleGoogle = () => {
   signUpWithGoogle(navigate);
 };
+
+const initialInfo = {
+  username:"",
+  email:"",
+  password:""
+}
+
+const [userinfo, setUserinfo] = useState(initialInfo)
+
+const handleChange =(e)=>{
+  e.preventDefault()
+
+  const{name,value} = e.target
+  setUserinfo({...userinfo,[name]:value})
+  console.log(userinfo);
+}
+
   // const { currentUser, error, loading } = useSelector((state) => state?.auth);
   return (
     <Container maxWidth="lg">
@@ -69,7 +87,7 @@ const handleGoogle = () => {
             Register
           </Typography>
           <Formik
-            initialValues={{ email: "", password: "" }}
+            initialValues={{userinfo }}
             validationSchema={loginSchema}
             onSubmit={(values, actions) => {
               //!login(values)
@@ -93,7 +111,7 @@ const handleGoogle = () => {
                     id="username"
                     type="text"
                     variant="outlined"
-                    value={values.username}
+                    value={userinfo.username}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched.username && Boolean(errors.username)}
