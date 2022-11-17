@@ -7,67 +7,75 @@ import LockIcon from "@mui/icons-material/Lock";
 import { Link, useNavigate } from "react-router-dom";
 // import { useSelector } from "react-redux";
 import { Formik, Form } from "formik";
-import { TextField, Button } from "@mui/material";
+import { TextField } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import * as yup from "yup";
-import { signUpWithGoogle } from "../helpers/firebase";
+import { createUser, signUpWithGoogle } from "../helpers/firebase";
 import { useState } from "react";
 const loginSchema = yup.object().shape({
   email: yup
     .string()
     .email("Please enter valid email")
     .required("Please  enter an email"),
-  password: yup
-    .string()
-    .required("Please enter a password ")
-    .min(8, "Password must have min 8 chars")
-    .max(16, "Password must have max 16 chars")
-    .matches(/\d+/, "Password must have a number")
-    .matches(/[a-z]+/, "Password must have a lowercase")
-    .matches(/[A-Z]+/, "Password must have an uppercase")
-    .matches(/[!,?{}><%&$#£+-.]+/, " Password must have a special char"),
+  password: yup.string().required("Please enter a password "),
+  // .min(8, "Password must have min 8 chars")
+  // .max(16, "Password must have max 16 chars")
+  // .matches(/\d+/, "Password must have a number")
+  // .matches(/[a-z]+/, "Password must have a lowercase")
+  // .matches(/[A-Z]+/, "Password must have an uppercase")
+  // .matches(/[!,?{}><%&$#£+-.]+/, " Password must have a special char"),
 });
-
-
-
-
 const Register = () => {
   const navigate = useNavigate();
-
-  
-const handleGoogle = () => {
-  signUpWithGoogle(navigate);
-};
-
-const initialInfo = {
-  username:"",
-  email:"",
-  password:""
-}
-
-const [userinfo, setUserinfo] = useState(initialInfo)
-
-const handleChange =(e)=>{
-  e.preventDefault()
-
-  const{name,value} = e.target
-  setUserinfo({...userinfo,[name]:value})
-  console.log(userinfo);
-}
-
   // const { currentUser, error, loading } = useSelector((state) => state?.auth);
+
+  const handleGoogle = () => {
+    signUpWithGoogle(navigate);
+  };
+  const initialInfo = {
+    username: "",
+    email: "",
+    password: "",
+  };
+
+  const [userInfo, setUserInfo] = useState(initialInfo);
+
+  const handleChangeInfo = (e) => {
+    e.preventDefault();
+    // const name=e.target.name;
+    // const value=e.target.value;
+    const { name, value } = e.target;
+    setUserInfo({ ...userInfo, [name]: value });
+    console.log(userInfo);
+  };
+  const firebaseGonder = () => {
+    createUser(userInfo.email, userInfo.password, navigate, userInfo.username);
+  };
+
   return (
     <Container maxWidth="lg">
       <Grid
         container
         justifyContent="center"
-        direction="row-reverse"
+        // direction="row-reverse"
         sx={{
           height: "100vh",
           p: 2,
         }}
       >
-        <Grid item mt={10} xs={12} sm={10} md={6}>
+        {/* <Grid item xs={12} mb={3}>
+          <Typography variant="h3" color="primary" align="center">
+            STOCK APP
+          </Typography>
+        </Grid> */}
+        <Grid
+          justifyContent="center"
+          alignItems="-moz-initial"
+          item
+          xs={12}
+          sm={10}
+          md={6}
+        >
           <Avatar
             sx={{
               backgroundColor: "secondary.light",
@@ -87,7 +95,7 @@ const handleChange =(e)=>{
             Register
           </Typography>
           <Formik
-            initialValues={{userinfo }}
+            initialValues={userInfo}
             validationSchema={loginSchema}
             onSubmit={(values, actions) => {
               //!login(values)
@@ -111,10 +119,10 @@ const handleChange =(e)=>{
                     id="username"
                     type="text"
                     variant="outlined"
-                    value={userinfo.username}
-                    onChange={handleChange}
+                    value={userInfo.username}
+                    onChange={handleChangeInfo}
                     onBlur={handleBlur}
-                    error={touched.username && Boolean(errors.username)}
+                    // error={touched.username && Boolean(errors.username)}
                     helperText={touched.username && errors.username}
                   />
                   <TextField
@@ -123,10 +131,10 @@ const handleChange =(e)=>{
                     id="email"
                     type="email"
                     variant="outlined"
-                    value={values.email}
-                    onChange={handleChange}
+                    value={userInfo.email}
+                    onChange={handleChangeInfo}
                     onBlur={handleBlur}
-                    error={touched.email && Boolean(errors.email)}
+                    // error={touched.email && Boolean(errors.email)}
                     helperText={touched.email && errors.email}
                   />
                   <TextField
@@ -135,36 +143,36 @@ const handleChange =(e)=>{
                     id="password"
                     type="password"
                     variant="outlined"
-                    value={values.password}
-                    onChange={handleChange}
+                    value={userInfo.password}
+                    onChange={handleChangeInfo}
                     onBlur={handleBlur}
-                    error={touched.password && Boolean(errors.password)}
+                    // error={touched.password && Boolean(errors.password)}
                     helperText={touched.password && errors.password}
                   />
+
                   <LoadingButton
                     type="submit"
                     // loading={loading}
                     loadingPosition="center"
                     variant="contained"
+                    onClick={firebaseGonder}
                   >
-                    Submit
+                    Register
                   </LoadingButton>
                   <LoadingButton
+                    sx={{ backgroundColor: "pink" }}
                     loadingPosition="center"
                     variant="contained"
-                    sx={{
-                      background: "purple",
-                    }}
                     onClick={handleGoogle}
                   >
-                    sign up with Google
+                    Sign Up With Google
                   </LoadingButton>
                 </Box>
               </Form>
             )}
           </Formik>
           <Box sx={{ textAlign: "center", mt: 2 }}>
-            <Link to="/login">Do you have an account?</Link>
+            <Link to="/login">Hesabın Varmi?</Link>
           </Box>
         </Grid>
         {/* <Grid item xs={10} sm={7} md={6}>
